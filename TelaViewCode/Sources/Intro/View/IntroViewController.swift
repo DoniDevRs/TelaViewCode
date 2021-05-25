@@ -9,9 +9,30 @@ import UIKit
 
 final class IntroViewController: UIViewController{
     
+    /// É melhor criar um enum com static, evitando magic numbers no código
+    enum Metrics {
+        static let fontSize: CGFloat = 16
+        static let titleFont: CGFloat = 40
+        static let margin: CGFloat = 20
+        static let textFieldW: CGFloat = 60
+        static let buttonH: CGFloat = 44
+        static let radius: CGFloat = 8
+    }
+    
+    /// É melhor criar um enum para evitar strings soltas no código
+    
+    enum Constants {
+        static let passGenerate = "Gerador de Senhas"
+        static let quantityPass = "Quantidade de Senhas: "
+        static let totalCharacters = "Total de Caracteres: "
+        static let useLowerCase = "Usar Letras Minúsculas: "
+        static let useNumbers = "Usar Números: "
+        static let makePass = "Gerar Senha"
+    }
+    
     private lazy var lbTitle: UILabel = {
         let label = UILabel()
-        label.text = "Gerador de Senhas"
+        label.text = Constants.passGenerate
         label.font = UIFont.boldSystemFont(ofSize: 40)
         label.textColor = UIColor.black
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -20,15 +41,17 @@ final class IntroViewController: UIViewController{
     
     private lazy var labelQtdeSenhas: UILabel = {
         let label = UILabel()
-        label.text = "Quantidade de Senhas: "
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.text = Constants.quantityPass
+        label.font = UIFont.systemFont(ofSize: Metrics.fontSize)
         label.textColor = UIColor.purple
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private lazy var tfSenhas: UITextField = {
-        let textField = UITextField(frame: CGRect(x: 0, y: 0, width: 400, height: 40))
+        /// Se você vai suar constrains e autolayout você não precisa definir o frame da view
+        //let textField = UITextField(frame: CGRect(x: 0, y: 0, width: 400, height: 40))
+        let textField = UITextField(frame: .zero)
         textField.backgroundColor = UIColor.white
         textField.borderStyle = .line
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -37,8 +60,8 @@ final class IntroViewController: UIViewController{
     
     private lazy var lbTotalCharacters: UILabel = {
         let label = UILabel()
-        label.text = "Total de Caracteres: "
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.text = Constants.totalCharacters
+        label.font = UIFont.systemFont(ofSize: Metrics.fontSize)
         label.textColor = UIColor.purple
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -54,8 +77,8 @@ final class IntroViewController: UIViewController{
     
     private lazy var lbLetrasMin: UILabel = {
         let label = UILabel()
-        label.text = "Usar Letras Minúsculas: "
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.text = Constants.useLowerCase
+        label.font = UIFont.systemFont(ofSize: Metrics.fontSize)
         label.textColor = UIColor.purple
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -63,8 +86,8 @@ final class IntroViewController: UIViewController{
     
     private lazy var lbNumeros: UILabel = {
         let label = UILabel()
-        label.text = "Usar Números: "
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.text = Constants.useNumbers
+        label.font = UIFont.systemFont(ofSize: Metrics.fontSize)
         label.textColor = UIColor.purple
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -89,19 +112,16 @@ final class IntroViewController: UIViewController{
     private lazy var btGerarSenha: UIButton = {
         let button = UIButton(frame: .zero)
         button.backgroundColor = .purple
-        button.setTitle("Gerar Senha", for: .normal)
-        
+        button.setTitle(Constants.makePass, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
+        /// Deixa o button mais redondo nas bordas
+        button.layer.cornerRadius = Metrics.radius
         return button
     }()
     
-    
- 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = .white
-        
         addSubView()
         constraintLabelTitle()
         constraintLabelQtdeSenhas()
@@ -117,7 +137,8 @@ final class IntroViewController: UIViewController{
     }
     
     
-    //Adiconar Views
+    // MARK: - Adiconar Views
+    
     private func addSubView(){
         view.addSubview(lbTitle)
         view.addSubview(labelQtdeSenhas)
@@ -132,60 +153,72 @@ final class IntroViewController: UIViewController{
     }
     
     
-    //Condigurar Constraints
+    // MARK: - Configurar Constraints
+    
     private func constraintLabelTitle(){
-        lbTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -20).isActive = true
-        lbTitle.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -300).isActive = true
+        /// Você pode usar assim para ativar todas constraints, e evitar o uso de isActive = true
+        NSLayoutConstraint.activate([
+            lbTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Metrics.margin),
+            lbTitle.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Metrics.margin),
+            lbTitle.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: Metrics.margin)
+        ])
     }
     
     private func constraintLabelQtdeSenhas(){
-        labelQtdeSenhas.topAnchor.constraint(equalTo: lbTitle.bottomAnchor, constant: 20).isActive = true
-        labelQtdeSenhas.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: -20).isActive = true
+        labelQtdeSenhas.centerYAnchor.constraint(equalTo: tfSenhas.centerYAnchor).isActive = true
+        labelQtdeSenhas.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Metrics.margin).isActive = true
+        labelQtdeSenhas.trailingAnchor.constraint(equalTo: tfSenhas.leadingAnchor, constant: -Metrics.margin).isActive = true
     }
     
     private func constraintTfSenhas(){
-        tfSenhas.topAnchor.constraint(equalTo: lbTitle.bottomAnchor, constant: 20).isActive = true
-        tfSenhas.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 135).isActive = true
-        
+        tfSenhas.topAnchor.constraint(equalTo: lbTitle.bottomAnchor, constant: Metrics.margin).isActive = true
+        tfSenhas.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Metrics.margin).isActive = true
+        /// Como textfield não tem conteudo ou texto quando é renderizado, você precisa definir um width pra ele ou ancorar em margens de uma view maior
+        tfSenhas.widthAnchor.constraint(equalToConstant: Metrics.textFieldW).isActive = true
     }
     
     private func constraintTotalCharacters(){
-        lbTotalCharacters.topAnchor.constraint(equalTo: labelQtdeSenhas.bottomAnchor, constant: 25).isActive = true
-        lbTotalCharacters.leadingAnchor.constraint(equalTo: labelQtdeSenhas.leadingAnchor).isActive = true
+        lbTotalCharacters.centerYAnchor.constraint(equalTo: tfCharacters.centerYAnchor).isActive = true
+        lbTotalCharacters.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Metrics.margin).isActive = true
+        lbTotalCharacters.trailingAnchor.constraint(equalTo: tfCharacters.leadingAnchor, constant: -Metrics.margin).isActive = true
     }
     
     private func constraintTfCharacters(){
-        tfCharacters.topAnchor.constraint(equalTo: tfSenhas.bottomAnchor, constant: 10).isActive = true
-        tfCharacters.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 135).isActive = true
+        tfCharacters.topAnchor.constraint(equalTo: tfSenhas.bottomAnchor, constant: Metrics.margin).isActive = true
+        tfCharacters.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Metrics.margin).isActive = true
+        /// Como textfield não tem conteudo ou texto quando é renderizado, você precisa definir um width pra ele ou ancorar em margens de uma view maior
+        tfCharacters.widthAnchor.constraint(equalToConstant: Metrics.textFieldW).isActive = true
     }
     
     private func constraintLbLetrasMin(){
-        lbLetrasMin.topAnchor.constraint(equalTo: lbTotalCharacters.bottomAnchor, constant: 25).isActive = true
-        lbLetrasMin.leadingAnchor.constraint(equalTo: lbTotalCharacters.leadingAnchor).isActive = true
-  
+        lbLetrasMin.topAnchor.constraint(equalTo: tfCharacters.bottomAnchor, constant: Metrics.margin).isActive = true
+        lbLetrasMin.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Metrics.margin).isActive = true
+        lbLetrasMin.trailingAnchor.constraint(equalTo: swLetrasMin.leadingAnchor, constant: -Metrics.margin).isActive = true
     }
     
     private func constraintSwLetrasMin(){
-        swLetrasMin.topAnchor.constraint(equalTo: tfCharacters.bottomAnchor, constant: 10).isActive = true
-        swLetrasMin.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 135).isActive = true
-        swLetrasMin.centerXAnchor.constraint(equalTo: lbLetrasMin.centerXAnchor).isActive = true
+        swLetrasMin.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Metrics.margin).isActive = true
+        /// Você pode centralizar seu switch centralizado ao label de letras min
+        swLetrasMin.centerYAnchor.constraint(equalTo: lbLetrasMin.centerYAnchor).isActive = true
     }
     
     private func constraintLbNumeros(){
-        lbNumeros.topAnchor.constraint(equalTo: lbLetrasMin.bottomAnchor, constant: 25).isActive = true
-        lbNumeros.leadingAnchor.constraint(equalTo: lbLetrasMin.leadingAnchor).isActive = true
+        lbNumeros.topAnchor.constraint(equalTo: lbLetrasMin.bottomAnchor, constant: Metrics.margin).isActive = true
+        lbNumeros.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Metrics.margin).isActive = true
+        lbNumeros.trailingAnchor.constraint(equalTo: swUsarNumeros.leadingAnchor, constant: -Metrics.margin).isActive = true
     }
     
     private func constraintUsarNumeros(){
-        swUsarNumeros.topAnchor.constraint(equalTo: swLetrasMin.bottomAnchor, constant: 10).isActive = true
-        swUsarNumeros.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 135).isActive = true
+        swUsarNumeros.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Metrics.margin).isActive = true
+        /// Você pode centralizar seu switch centralizado ao label de letras min
+        swUsarNumeros.centerYAnchor.constraint(equalTo: lbNumeros.centerYAnchor).isActive = true
     }
     
     private func constraintBtGerarSenha(){
-        btGerarSenha.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
-        btGerarSenha.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15).isActive = true
-        btGerarSenha.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        btGerarSenha.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -15).isActive = true
+        btGerarSenha.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Metrics.margin).isActive = true
+        btGerarSenha.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Metrics.margin).isActive = true
+        btGerarSenha.heightAnchor.constraint(equalToConstant: Metrics.buttonH).isActive = true
+        btGerarSenha.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Metrics.margin).isActive = true
     }
     
     
